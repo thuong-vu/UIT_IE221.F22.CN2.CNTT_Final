@@ -64,5 +64,4 @@ thu-chi-app/
 ## Yêu cầu hệ thống
 
 - Python 3.9+
-- XAMPP với MySQL 5.7+ / MariaDB 10.4+
-- Trình duyệt hiện đại (Chrome, Firefox, Safari, Edge)
+- XAMPP với MySQL
