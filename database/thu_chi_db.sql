@@ -38,3 +38,24 @@ CREATE TABLE transactions (
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+DELIMITER //
+
+CREATE TRIGGER after_user_insert
+AFTER INSERT ON users
+FOR EACH ROW
+BEGIN
+    INSERT INTO categories (name, icon, type, user_id) VALUES
+    ('Ăn uống',    'ti-tools-kitchen-2', 'expense', NEW.id),
+    ('Di chuyển',  'ti-car',             'expense', NEW.id),
+    ('Mua sắm',    'ti-shopping-bag',    'expense', NEW.id),
+    ('Nhà cửa',    'ti-home',            'expense', NEW.id),
+    ('Sức khoẻ',   'ti-heart',           'expense', NEW.id),
+    ('Giải trí',   'ti-device-tv',       'expense', NEW.id),
+    ('Khác',       'ti-clipboard',       'expense', NEW.id),
+    ('Lương',      'ti-currency-dollar', 'income',  NEW.id),
+    ('Thưởng',     'ti-gift',            'income',  NEW.id),
+    ('Đầu tư',     'ti-trending-up',     'income',  NEW.id),
+    ('Thu khác',   'ti-wallet',          'income',  NEW.id);
+END //
+
+DELIMITER ;
