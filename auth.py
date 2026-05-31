@@ -26,7 +26,7 @@ def register():
             if cursor.fetchone():
                 return jsonify({'error': 'Tài khoản này đã tồn tại'}), 400
 
-            hashed_password = generate_password_hash(password)
+            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
             cursor.execute(
                 "INSERT INTO users (username, password) VALUES (%s, %s)",
                 (username, hashed_password)

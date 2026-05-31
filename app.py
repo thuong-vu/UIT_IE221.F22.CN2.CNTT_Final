@@ -262,5 +262,13 @@ def get_overview():
         conn.close()
 
 
+@app.errorhandler(500)
+def internal_error(e):
+    return jsonify({'error': f'Lỗi server: {str(e)}'}), 500
+
+@app.errorhandler(Exception)
+def unhandled_exception(e):
+    return jsonify({'error': f'Lỗi không xác định: {str(e)}'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
