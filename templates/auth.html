@@ -53,6 +53,15 @@ body{font-family:'Inter',system-ui,sans-serif;display:flex;justify-content:cente
 .auth-btn:active{transform:translateY(0)}
 .auth-btn:disabled{opacity:.8;cursor:not-allowed;transform:none}
 
+/* ── Field Hint ───────────────────────────────────────────────────────── */
+.field-hint{
+  font-size:12px;color:#757575;margin-top:6px;display:none;
+  padding:7px 10px;background:#E3F2FD;border-radius:8px;
+  line-height:1.5;
+}
+.field-hint.visible{display:block}
+.field-hint i{color:#1976D2;margin-right:4px}
+
 /* ── Toggle Link ──────────────────────────────────────────────────────── */
 .switch-mode{margin-top:20px;font-size:13px;color:#666}
 .switch-mode a{color:#2196F3;text-decoration:none;font-weight:600;margin-left:4px}
@@ -91,6 +100,9 @@ body{font-family:'Inter',system-ui,sans-serif;display:flex;justify-content:cente
       <div class="input-wrapper">
         <i class="ti ti-user"></i>
         <input type="text" id="username" class="form-input" placeholder="Nhập tài khoản" required autocomplete="username"/>
+      </div>
+      <div class="field-hint" id="username-hint">
+        <i class="ti ti-info-circle"></i>Tài khoản phải là địa chỉ email hợp lệ, ví dụ: <strong>ten@example.com</strong>
       </div>
     </div>
 
@@ -140,16 +152,25 @@ function toggleMode(e) {
   // Reset form khi chuyển chế độ
   document.getElementById('auth-form').reset();
 
+  const usernameInput = document.getElementById('username');
+  const usernameHint  = document.getElementById('username-hint');
+
   if (isLoginMode) {
     title.textContent = 'Chào mừng trở lại';
     desc.textContent = 'Vui lòng đăng nhập để quản lý chi tiêu';
     btn.querySelector('span').textContent = 'Đăng Nhập';
     switchBox.innerHTML = `Chưa có tài khoản?<a href="#" onclick="toggleMode(event)">Đăng ký ngay</a>`;
+    usernameInput.placeholder = 'Nhập tài khoản';
+    usernameInput.type = 'text';
+    usernameHint.classList.remove('visible');
   } else {
     title.textContent = 'Tạo tài khoản mới';
     desc.textContent = 'Bắt đầu hành trình quản lý tài chính thông minh';
     btn.querySelector('span').textContent = 'Đăng Ký Tài Khoản';
     switchBox.innerHTML = `Đã có tài khoản?<a href="#" onclick="toggleMode(event)">Đăng nhập</a>`;
+    usernameInput.placeholder = 'Nhập địa chỉ email';
+    usernameInput.type = 'email';
+    usernameHint.classList.add('visible');
   }
 }
 
@@ -162,6 +183,11 @@ async function handleSubmit(e) {
   const btn = document.getElementById('submit-btn');
 
   if (!username || !password) return;
+
+  if (!isLoginMode && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username)) {
+    showToast('Tài khoản phải là địa chỉ email hợp lệ', 'error');
+    return;
+  }
 
   isSubmitting = true;
   const originalText = btn.querySelector('span') ? btn.querySelector('span').textContent : btn.textContent;
