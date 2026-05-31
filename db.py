@@ -1,17 +1,24 @@
 import pymysql
-import pymysql.cursors
-import os
-from dotenv import load_dotenv
+from pymysql.cursors import DictCursor
+from dbutils.pooled_db import PooledDB
 
-load_dotenv()
+DB_CONFIG = {
+    'host': 'localhost',
+    'user': 'thuchi_admin',
+    'password': '123',
+    'database': 'thu_chi_db',
+    'charset': 'utf8mb4',
+    'cursorclass': DictCursor
+}
+
+pool = PooledDB(
+    creator=pymysql,
+    mincached=2,
+    maxcached=5,
+    maxconnections=10,
+    blocking=True,
+    **DB_CONFIG
+)
 
 def get_connection():
-    return pymysql.connect(
-        host=os.getenv('DB_HOST', 'localhost'),
-        port=int(os.getenv('DB_PORT', 3306)),
-        user=os.getenv('DB_USER', 'root'),
-        password=os.getenv('DB_PASSWORD', ''),
-        database=os.getenv('DB_NAME', 'thu_chi_db'),
-        charset='utf8mb4',
-        cursorclass=pymysql.cursors.DictCursor
-    )
+    return pool.connection()
