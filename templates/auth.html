@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Đăng nhập - Sổ Thu Chi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.3.0/tabler-icons.min.css"/>
+<style>
+/* ── Reset & Base ─────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#f0f2f5}
+body{font-family:'Inter',system-ui,sans-serif;display:flex;justify-content:center;align-items:center;padding:16px}
+
+/* ── Container ────────────────────────────────────────────────────────── */
+.auth-container{
+  width:100%;max-width:400px;background:#fff;
+  border-radius:24px;padding:32px 24px;
+  box-shadow:0 10px 30px rgba(0,0,0,.05);
+  text-align:center;animation:slideUp .3s ease;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Brand Logo ───────────────────────────────────────────────────────── */
+.brand-icon{
+  width:54px;height:54px;background:linear-gradient(135deg,#1976D2,#2196F3);
+  color:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  font-size:26px;margin:0 auto 16px;box-shadow:0 4px 12px rgba(33,150,243,.3);
+}
+.auth-container h2{font-size:22px;font-weight:700;color:#212121;margin-bottom:6px}
+.auth-container p{font-size:13px;color:#757575;margin-bottom:28px}
+
+/* ── Form Controls ────────────────────────────────────────────────────── */
+.form-group{margin-bottom:18px;text-align:left}
+.form-label{font-size:12px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:block}
+.input-wrapper{position:relative}
+.input-wrapper i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#bdbdbd;font-size:18px}
+.form-input{
+  width:100%;padding:13px 14px 13px 42px;border:2px solid #e0e0e0;border-radius:12px;
+  font-size:14px;color:#212121;outline:none;transition:all .2s;background:#fafafa;font-family:inherit;
+}
+.form-input:focus{border-color:#2196F3;background:#fff;box-shadow:0 0 0 3px rgba(33,150,243,0.1)}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.auth-btn{
+  width:100%;padding:14px;background:linear-gradient(135deg,#1976D2,#42A5F5);
+  color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;
+  gap:8px;font-family:inherit;box-shadow:0 4px 14px rgba(33,150,243,.3);margin-top:24px;
+}
+.auth-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(33,150,243,.4)}
+.auth-btn:active{transform:translateY(0)}
+.auth-btn:disabled{opacity:.8;cursor:not-allowed;transform:none}
+
+/* ── Field Hint ───────────────────────────────────────────────────────── */
+.field-hint{
+  font-size:12px;color:#757575;margin-top:6px;display:none;
+  padding:7px 10px;background:#E3F2FD;border-radius:8px;
+  line-height:1.5;
+}
+.field-hint.visible{display:block}
+.field-hint i{color:#1976D2;margin-right:4px}
+
+/* ── Toggle Link ──────────────────────────────────────────────────────── */
+.switch-mode{margin-top:20px;font-size:13px;color:#666}
+.switch-mode a{color:#2196F3;text-decoration:none;font-weight:600;margin-left:4px}
+.switch-mode a:hover{text-decoration:underline}
+
+/* ── Toast Message ────────────────────────────────────────────────────── */
+.toast{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);
+  background:#323232;color:#fff;padding:12px 20px;border-radius:24px;
+  font-size:13px;font-weight:500;white-space:nowrap;opacity:0;
+  transition:all .3s;pointer-events:none;z-index:9999;box-shadow:0 4px 15px rgba(0,0,0,.2);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:#C62828}
+.toast.success{background:#2E7D32}
+
+/* Đã sửa lỗi hiển thị khối và canh lề giữa cho vòng xoay loading */
+.spinner{
+  display: inline-block;
+  width:20px;height:20px;border:2px solid rgba(255,255,255,.4);
+  border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="auth-container">
+  <div class="brand-icon"><i class="ti ti-wallet"></i></div>
+  <h2 id="auth-title">Chào mừng trở lại</h2>
+  <p id="auth-desc">Vui lòng đăng nhập để quản lý chi tiêu</p>
+
+  <form id="auth-form" onsubmit="handleSubmit(event)">
+    <div class="form-group">
+      <label class="form-label">Tài khoản</label>
+      <div class="input-wrapper">
+        <i class="ti ti-user"></i>
+        <input type="text" id="username" class="form-input" placeholder="Nhập tài khoản" required autocomplete="username"/>
+      </div>
+      <div class="field-hint" id="username-hint">
+        <i class="ti ti-info-circle"></i>Tài khoản phải là địa chỉ email hợp lệ, ví dụ: <strong>ten@example.com</strong>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Mật khẩu</label>
+      <div class="input-wrapper">
+        <i class="ti ti-lock"></i>
+        <input type="password" id="password" class="form-input" placeholder="Nhập mật khẩu" required autocomplete="current-password"/>
+      </div>
+    </div>
+
+    <button type="submit" class="auth-btn" id="submit-btn">
+      <span>Đăng Nhập</span>
+    </button>
+  </form>
+
+  <div class="switch-mode" id="switch-box">
+    Chưa có tài khoản?<a href="#" onclick="toggleMode(event)">Đăng ký ngay</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let isLoginMode = true;
+let isSubmitting = false; // Biến cờ chặn double submit
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.className = 'toast'; }, 2500);
+}
+
+function toggleMode(e) {
+  e.preventDefault();
+  if (isSubmitting) return; // Không cho chuyển chế độ khi đang gửi dữ liệu
+
+  isLoginMode = !isLoginMode;
+
+  const title = document.getElementById('auth-title');
+  const desc = document.getElementById('auth-desc');
+  const btn = document.getElementById('submit-btn');
+  const switchBox = document.getElementById('switch-box');
+
+  // Reset form khi chuyển chế độ
+  document.getElementById('auth-form').reset();
+
+  const usernameInput = document.getElementById('username');
+  const usernameHint  = document.getElementById('username-hint');
+
+  if (isLoginMode) {
+    title.textContent = 'Chào mừng trở lại';
+    desc.textContent = 'Vui lòng đăng nhập để quản lý chi tiêu';
+    btn.querySelector('span').textContent = 'Đăng Nhập';
+    switchBox.innerHTML = `Chưa có tài khoản?<a href="#" onclick="toggleMode(event)">Đăng ký ngay</a>`;
+    usernameInput.placeholder = 'Nhập tài khoản';
+    usernameInput.type = 'text';
+    usernameHint.classList.remove('visible');
+  } else {
+    title.textContent = 'Tạo tài khoản mới';
+    desc.textContent = 'Bắt đầu hành trình quản lý tài chính thông minh';
+    btn.querySelector('span').textContent = 'Đăng Ký Tài Khoản';
+    switchBox.innerHTML = `Đã có tài khoản?<a href="#" onclick="toggleMode(event)">Đăng nhập</a>`;
+    usernameInput.placeholder = 'Nhập địa chỉ email';
+    usernameInput.type = 'email';
+    usernameHint.classList.add('visible');
+  }
+}
+
+async function handleSubmit(e) {
+  e.preventDefault();
+  if (isSubmitting) return; // Chặn nếu tiến trình trước đó chưa chạy xong
+
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const btn = document.getElementById('submit-btn');
+
+  if (!username || !password) return;
+
+  if (!isLoginMode && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username)) {
+    showToast('Tài khoản phải là địa chỉ email hợp lệ', 'error');
+    return;
+  }
+
+  isSubmitting = true;
+  const originalText = btn.querySelector('span') ? btn.querySelector('span').textContent : btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+
+  const url = isLoginMode ? '/api/auth/login' : '/api/auth/register';
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Đã xảy ra lỗi hệ thống');
+    }
+
+    if (isLoginMode) {
+      showToast('Đăng nhập thành công! Đang chuyển hướng...', 'success');
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+    } else {
+      showToast('✓ Đăng ký thành công! Hãy đăng nhập.', 'success');
+      // Tự động chuyển về giao diện đăng nhập
+      isLoginMode = true;
+      document.getElementById('auth-title').textContent = 'Chào mừng trở lại';
+      document.getElementById('auth-desc').textContent = 'Vui lòng đăng nhập để quản lý chi tiêu';
+      document.getElementById('switch-box').innerHTML = `Chưa có tài khoản?<a href="#" onclick="toggleMode(event)">Đăng ký ngay</a>`;
+      document.getElementById('auth-form').reset();
+    }
+
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    // Đảm bảo mở khóa nút bấm và hoàn tác trạng thái sau khi hoàn tất request
+    isSubmitting = false;
+    btn.disabled = false;
+    btn.innerHTML = `<span>${originalText}</span>`;
+  }
+}
+</script>
+</body>
+</html>
